@@ -1,4 +1,3 @@
----
 apiVersion: "v1"
 kind: "List"
 items:
@@ -59,7 +58,7 @@ items:
                httpGet:
                  path: /
                  port: 8080
-               initialDelaySeconds: 90
+               initialDelaySeconds: 120
                periodSeconds: 5
             readinessProbe:
                httpGet:
@@ -70,6 +69,10 @@ items:
             resources:
               requests:
                 memory: "#{k8s.memoryrequest_slave}#"
+                cpu: "#{k8s.cpurequest_slave}#"
+              limits:
+                memory: "#{k8s.memorylimit_slave}#"
+                cpu: "#{k8s.cpulimit_slave}#"
             env:
               - name: CF_INSTANCE_INDEX
                 value: "1"
@@ -151,7 +154,7 @@ items:
                httpGet:
                  path: /
                  port: 8080
-               initialDelaySeconds: 90
+               initialDelaySeconds: 120
                periodSeconds: 5
             readinessProbe:
                httpGet:
@@ -163,6 +166,10 @@ items:
             resources:
               requests:
                 memory: "#{k8s.memoryrequest_leader}#"
+                cpu: "#{k8s.cpurequest_leader}#"
+              limits:
+                memory: "#{k8s.memorylimit_leader}#" 
+                cpu: "#{k8s.cpulimit_leader}#"
             env:
               - name: CF_INSTANCE_INDEX
                 value: "0"
@@ -220,3 +227,17 @@ items:
       - name: http
         port: 80
         targetPort: 8080
+
+  - apiVersion: "autoscaling/v1"
+    kind: "HorizontalPodAutoscaler"
+    metadata: 
+      name: "#{k8s.namespace}#-slave-autoscale"
+    spec: 
+      maxReplicas: 10 #max replica counts
+      minReplicas: 5 #min replica count
+      scaleTargetRef:
+        apiVersion: apps/v1
+        kind: Deployment
+        name: "#{k8s.namespace}#-slave"
+      targetCPUUtilizationPercentage: 75 # target CPU utilization
+ 
