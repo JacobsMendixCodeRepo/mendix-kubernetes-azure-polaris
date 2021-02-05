@@ -233,8 +233,8 @@ items:
     metadata: 
       name: "#{k8s.namespace}#-slave-autoscale"
     spec: 
-      maxReplicas: 15 #max replica counts
-      minReplicas: 10 #min replica count
+      maxReplicas: 20 #max replica counts
+      minReplicas: 15 #min replica count
       scaleTargetRef:
         apiVersion: apps/v1
         kind: Deployment
